@@ -1,14 +1,21 @@
 package main
 
 import (
+	"github.com/RaymondCode/simple-demo/dao"
+	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
-	"github.com/RaymondCode/simple-demo/src/dao"
-
 )
 
 func main() {
 
 	dao.ConnectDb()
+	service.OSSkeyinit()
+
+
+
+//	dao.GetList()
+	//util.GetSnapshot("D:\\CF\\stg.mp4","D:\\CF\\BEAR",20)
+
 	r := gin.Default()
 
 	initRouter(r)
