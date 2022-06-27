@@ -8,8 +8,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
-var Db *gorm.DB
 
+var Db *gorm.DB
 
 func ConnectDb() {
 	var (
@@ -24,26 +24,25 @@ func ConnectDb() {
 
 func GetList() []entities.Video {
 	//node := entities.Tbs{Val: 1}
-	var lists []entities.Video2;
+	var lists []entities.Video2
 
+	Db.Table("video").Where("id > ?", 0).Order("id desc").Limit(30).Debug().Find(&lists)
+	var resLists []entities.Video
 
-	Db.Table("video").Where("id > ?", 0).Debug().Find(&lists)
-	var resLists []entities.Video;
+	for i := 0; i < len(lists); i++ {
 
-	for i:=0;i< len(lists);i++  {
+		var userNode entities.User2
 
-		var userNode entities.User2;
+		Db.Table("user").Where("id = ?", lists[i].AuthorId).Debug().Find(&userNode)
 
-		Db.Table("user").Where("id = ?",lists[i].AuthorId).Debug().Find(&userNode)
-
-		 resuserNode:= entities.User{
-			Id:           userNode.Id,
-			Name:         userNode.Name,
-			FollowCount:  userNode.FollowCount,
+		resuserNode := entities.User{
+			Id:            userNode.Id,
+			Name:          userNode.Name,
+			FollowCount:   userNode.FollowCount,
 			FollowerCount: userNode.FollowerCount,
 			IsFollow:      userNode.IsFollow,
-		};
-		resLists=append(resLists, entities.Video{
+		}
+		resLists = append(resLists, entities.Video{
 			Id:            lists[i].Id,
 			Author:        resuserNode,
 			PlayUrl:       lists[i].PlayUrl,
@@ -53,26 +52,59 @@ func GetList() []entities.Video {
 			IsFavorite:    lists[i].IsFavorite,
 		})
 
+	}
+	for i := 0; i < len(resLists); i++ {
+		fmt.Print("%v+\n", resLists[i])
+	}
+	return resLists
 
+}
 
+func GetListById(id int64) []entities.Video {
+	//node := entities.Tbs{Val: 1}
+	var lists []entities.Video2
 
+	Db.Table("video").Where("author_id = ?", id).Order("id desc").Limit(30).Debug().Find(&lists)
+	var resLists []entities.Video
+
+	for i := 0; i < len(lists); i++ {
+
+		var userNode entities.User2
+
+		Db.Table("user").Where("id = ?", id).Debug().Find(&userNode)
+
+		resuserNode := entities.User{
+			Id:            userNode.Id,
+			Name:          userNode.Name,
+			FollowCount:   userNode.FollowCount,
+			FollowerCount: userNode.FollowerCount,
+			IsFollow:      userNode.IsFollow,
+		}
+		resLists = append(resLists, entities.Video{
+			Id:            lists[i].Id,
+			Author:        resuserNode,
+			PlayUrl:       lists[i].PlayUrl,
+			CoverUrl:      lists[i].CoverUrl,
+			FavoriteCount: lists[i].FavoriteCount,
+			CommentCount:  lists[i].CommentCount,
+			IsFavorite:    lists[i].IsFavorite,
+		})
 
 	}
-	for i:=0;i<len(resLists);i++{
-		fmt.Print("%v+\n",resLists[i])
+	for i := 0; i < len(resLists); i++ {
+		fmt.Print("%v+\n", resLists[i])
 	}
 	return resLists
 
 }
 
 type OSSKey struct {
-	Key           string  `form:"key"`
-	Secret        string `form:"secret"`
-
+	Key    string `form:"key"`
+	Secret string `form:"secret"`
 }
-func GetOSSKEy() []string{
-	var res OSSKey;
+
+func GetOSSKEy() []string {
+	var res OSSKey
 	Db.Table("osskey").Debug().First(&res)
-	return []string{res.Key,res.Secret}
+	return []string{res.Key, res.Secret}
 }
-

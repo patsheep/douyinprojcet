@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/RaymondCode/simple-demo/dao"
+	"github.com/RaymondCode/simple-demo/kafkatest"
 	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
 )
@@ -11,9 +12,10 @@ func main() {
 	dao.ConnectDb()
 	service.OSSkeyinit()
 
+	// go kafkatest.RunProducer();
+	go kafkatest.RunConsumer()
 
-
-//	dao.GetList()
+	//	dao.GetList()
 	//util.GetSnapshot("D:\\CF\\stg.mp4","D:\\CF\\BEAR",20)
 
 	r := gin.Default()

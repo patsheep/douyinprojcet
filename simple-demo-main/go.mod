@@ -5,6 +5,7 @@ go 1.17
 require github.com/gin-gonic/gin v1.7.7
 
 require (
+	github.com/Shopify/sarama v1.34.1
 	github.com/aliyun/aliyun-oss-go-sdk v2.2.4+incompatible
 	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
 	github.com/disintegration/imaging v1.6.2
