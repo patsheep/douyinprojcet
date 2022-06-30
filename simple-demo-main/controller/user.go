@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"fmt"
+	"github.com/RaymondCode/simple-demo/dao"
 	"github.com/RaymondCode/simple-demo/entities"
+	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"sync/atomic"
@@ -18,12 +21,12 @@ var usersLoginInfo = map[string]entities.User{
 		FollowerCount: 5,
 		IsFollow:      true,
 	},
-	"123123456":{
-		Id:			1,
-		Name:		"123",
-		FollowCount:	0,
-		FollowerCount:	0,
-		IsFollow: false,
+	"123123456": {
+		Id:            1,
+		Name:          "123",
+		FollowCount:   0,
+		FollowerCount: 0,
+		IsFollow:      false,
 	},
 }
 
@@ -57,6 +60,13 @@ func Register(c *gin.Context) {
 			Name: username,
 		}
 		usersLoginInfo[token] = newUser
+		err := service.AddNewUser(username, password)
+		if err != nil {
+			c.JSON(http.StatusOK, UserLoginResponse{
+				Response: entities.Response{StatusCode: 1, StatusMsg: "error please try again"},
+			})
+			return
+		}
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: entities.Response{StatusCode: 0},
 			UserId:   userIdSequence,
@@ -78,6 +88,8 @@ func Login(c *gin.Context) {
 			Token:    token,
 		})
 	} else {
+		user2, _ := dao.GetUserByIdAndPassword(username, password)
+		fmt.Printf("%v+", user2)
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: entities.Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
 		})

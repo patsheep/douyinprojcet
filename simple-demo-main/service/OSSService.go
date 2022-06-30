@@ -1,9 +1,13 @@
 package service
 
 import (
+	"crypto/md5"
+	"encoding/base64"
 	"fmt"
 	"github.com/RaymondCode/simple-demo/dao"
+	"github.com/RaymondCode/simple-demo/util"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"io"
 	"os"
 	"sync"
 )
@@ -61,13 +65,18 @@ func UploadFile(name string, wg *sync.WaitGroup) {
 	//	fp :=absPath+name
 	//strings.ReplaceAll(fp,"\\","\\\\")
 	//err := bucket.PutObjectFromFile(name,absPath+"\\"+name )
-
-	err := videoBucket.PutObjectFromFile("video/"+name, absPath+"\\video\\"+name)
+	//err := videoBucket.PutObjectFromFile("video/"+name, absPath+"\\video\\"+name)
+	err := videoBucket.UploadFile("video/"+name, absPath+"\\video\\"+name, 100*1024, oss.Routines(10), oss.Checkpoint(true, ""), oss.ContentMD5(util.CountBase64Val(absPath+"\\video\\"+name))) //该方法支持断点续传，分片上传
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
 	err = videoBucket.SetObjectACL("video/"+name, oss.ACLPublicRead)
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(-1)
+	}
+	err = os.Remove(absPath + "\\video\\" + name)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
@@ -93,6 +102,11 @@ func UploadCover(name string, wg *sync.WaitGroup) {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
+	err = os.Remove(absPath + "\\cover\\" + name + ".jpeg")
+	if err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(-1)
+	}
 	defer wg.Done()
 }
 
@@ -106,15 +120,36 @@ func DirectUpload(name string) {
 	//strings.ReplaceAll(fp,"\\","\\\\")
 	//err := bucket.PutObjectFromFile(name,absPath+"\\"+name )
 
-	err := videoBucket.PutObjectFromFile("video/"+"x"+name, absPath+"\\video\\"+name)
+	/*	objectValue := "0123456789"
+
+		mh := md5.Sum([]byte(objectValue))
+		md5B64 := base64.StdEncoding.EncodeToString(mh[:])
+		fmt.Println(md5B64)*/
+	h := md5.New()
+	f, err := os.Open(absPath + "\\video\\" + name)
+	if err != nil {
+		return
+	}
+
+	io.Copy(h, f)
+	re := h.Sum(nil) //算MD5值
+	fmt.Printf("%x\n", re)
+	mdHex := base64.StdEncoding.EncodeToString(h.Sum(nil)[:]) //MD5先转二进制数组再转base64编码
+	fmt.Println(mdHex)
+	options := []oss.Option{
+		oss.ContentMD5(mdHex),
+		//B076A6BD67245533F9D1ACCF1112248C
+
+	}
+	err = videoBucket.PutObjectFromFile("video/"+"x"+name, absPath+"\\video\\"+name, options...)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
-	err = videoBucket.SetObjectACL("video/"+"x"+name, oss.ACLPublicRead)
-	if err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(-1)
-	}
+	/*	err = videoBucket.SetObjectACL("video/"+"x"+name, oss.ACLPublicRead)
+		if err != nil {
+			fmt.Println("Error:", err)
+			os.Exit(-1)
+		}*/
 
 }

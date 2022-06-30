@@ -7,7 +7,6 @@ import (
 	"github.com/RaymondCode/simple-demo/entities"
 	"github.com/RaymondCode/simple-demo/kafkatest"
 	"github.com/RaymondCode/simple-demo/service"
-	"github.com/RaymondCode/simple-demo/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path/filepath"
@@ -37,8 +36,16 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
-
 	filename := filepath.Base(data.Filename)
+	fmt.Printf("文件大小为: %d 类型为 %s\n", data.Size, filename[len(filename)-3:])
+
+	if filename[len(filename)-3:] != "mp4" {
+		c.JSON(http.StatusOK, entities.Response{
+			StatusCode: 1,
+			StatusMsg:  "不支持的文件类型",
+		})
+		return
+	}
 	fmt.Println(filename + "!")
 	user := usersLoginInfo[token]
 	var key = publishTempToDB(user.Id)
@@ -55,7 +62,7 @@ func Publish(c *gin.Context) {
 	}
 
 	//defer publishToDB(finalName,user.Id)
-	defer generateSnapshotAndProduce(finalName, key)
+	defer kafkatest.ProducerSend(finalName, key)
 
 	c.JSON(http.StatusOK, entities.Response{
 		StatusCode: 0,
@@ -82,11 +89,6 @@ func PublishList(c *gin.Context) {
 	})
 }
 
-func generateSnapshotAndProduce(finalName string, key int64) {
-	util.GetSnapshot("D:\\douyin\\douyinprojcet\\simple-demo-main\\video\\"+finalName, "D:\\douyin\\douyinprojcet\\simple-demo-main\\cover\\"+finalName[0:len(finalName)-4], 10)
-	kafkatest.ProducerSend(finalName, key)
-
-}
 func publishToDB(filename string, id int64) {
 	vd := entities.Video2{
 		AuthorId:      id,

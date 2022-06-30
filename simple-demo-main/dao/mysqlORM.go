@@ -3,6 +3,7 @@ package dao
 import (
 	"fmt"
 	"github.com/RaymondCode/simple-demo/entities"
+	"strconv"
 
 	//"fmt" // 导入 fmt 包，打印字符串是需要用到
 	"gorm.io/driver/mysql"
@@ -28,12 +29,36 @@ func GetList() []entities.Video {
 
 	Db.Table("video").Where("id > ?", 0).Order("id desc").Limit(30).Debug().Find(&lists)
 	var resLists []entities.Video
+	var userIdList []int64
 
+	for i := 0; i < len(lists); i++ {
+		userIdList = append(userIdList, lists[i].AuthorId)
+	}
+	for i := 0; i < len(userIdList); i++ {
+		fmt.Println(strconv.Itoa(i) + " " + strconv.FormatInt(userIdList[i], 10))
+	}
+	var temp []entities.User2
+	tempmap := map[int64]entities.User2{}
+	Db.Table("user").Where("id In ?", userIdList).Debug().Find(&temp)
+	for i := 0; i < len(temp); i++ {
+		fmt.Println("", temp[i])
+
+		tempmap[temp[i].Id] = temp[i]
+
+	}
+	for key, val := range tempmap {
+		fmt.Println(key, val)
+	}
 	for i := 0; i < len(lists); i++ {
 
 		var userNode entities.User2
-
-		Db.Table("user").Where("id = ?", lists[i].AuthorId).Debug().Find(&userNode)
+		value, ok := tempmap[lists[i].AuthorId]
+		if ok {
+			userNode = value
+		} else {
+			fmt.Println("去数据库中查找")
+			Db.Table("user").Where("id = ?", lists[i].AuthorId).Debug().Find(&userNode)
+		}
 
 		resuserNode := entities.User{
 			Id:            userNode.Id,

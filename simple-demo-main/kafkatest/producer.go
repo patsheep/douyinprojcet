@@ -45,6 +45,7 @@ func RunProducer() {
 	}
 }
 func ProducerSend(str string, key int64) {
+
 	//获取配置类
 	config := sarama.NewConfig()                              //配置类实例（指针类型）
 	config.Producer.RequiredAcks = sarama.WaitForAll          //代理需要的确认可靠性级别(默认为WaitForLocal)

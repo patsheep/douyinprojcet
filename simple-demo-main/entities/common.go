@@ -17,7 +17,7 @@ type Video struct {
 
 type Video2 struct {
 	Id            int64  `form:"id,omitempty"`
-	AuthorId       int64   `form:"author_id"`
+	AuthorId      int64  `form:"author_id"`
 	PlayUrl       string `form:"play_url"`
 	CoverUrl      string `form:"cover_url,omitempty"`
 	FavoriteCount int64  `form:"favorite_count,omitempty"`
@@ -41,6 +41,8 @@ type User struct {
 }
 type User2 struct {
 	Id            int64  `form:"id,omitempty"`
+	UserId        string `form:"user_id,omitempty"`
+	Password      string `form:"password,omitempty"`
 	Name          string `form:"name,omitempty"`
 	FollowCount   int64  `form:"follow_count,omitempty"`
 	FollowerCount int64  `form:"follower_count,omitempty"`

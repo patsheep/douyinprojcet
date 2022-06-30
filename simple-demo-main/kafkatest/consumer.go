@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/RaymondCode/simple-demo/dao"
 	"github.com/RaymondCode/simple-demo/service"
+	"github.com/RaymondCode/simple-demo/util"
 	"github.com/Shopify/sarama"
 	"strconv"
 	"strings"
@@ -58,7 +59,8 @@ func RunConsumer() {
 				if err != nil {
 					fmt.Println("bug")
 				}
-
+				util.GetSnapshot("D:\\douyin\\douyinprojcet\\simple-demo-main\\video\\"+finalName, "D:\\douyin\\douyinprojcet\\simple-demo-main\\cover\\"+finalName[0:len(finalName)-4], 10)
+				fmt.Println("封面图生成完成")
 				publishToDB(finalName, key)
 				fmt.Println("审核完成#")
 			}
