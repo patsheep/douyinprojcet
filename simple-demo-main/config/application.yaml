@@ -1,0 +1,29 @@
+gin:
+  host: localhost
+  port: 8080
+
+
+mysql:
+  host: localhost
+  port: 3306
+  username: root
+  password: 97782078
+  db_name: douyin
+  max_open_conns: 100
+  max_idle_conns: 10
+
+redis:
+  host: localhost
+  port: 6379
+  password:
+  db: 1
+  pool_size: 100
+
+oss:
+  key: #阿里云OSS账号
+  secret: #阿里云OSS密码
+  endpoint: https://oss-cn-shanghai.aliyuncs.com
+  bucket: pathcystore
+
+snowflake:
+  mechineid: 0 #机器编号，用于生成雪花ID

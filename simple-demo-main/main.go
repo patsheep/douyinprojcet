@@ -1,19 +1,21 @@
 package main
 
 import (
-	"github.com/RaymondCode/simple-demo/dao"
-	"github.com/RaymondCode/simple-demo/kafkatest"
-	"github.com/RaymondCode/simple-demo/service"
+	"github.com/RaymondCode/simple-demo/initialize"
+	"github.com/RaymondCode/simple-demo/kafka"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+/*	fmt.Println(service.GetToken("weqwe"))
+	time.Sleep(time.Second)
+	fmt.Println(service.GetToken("weqwe"))*/
 
-	dao.ConnectDb()
-	service.OSSkeyinit()
+	initialize.AssignMent()
+
 
 	// go kafkatest.RunProducer();
-	go kafkatest.RunConsumer()
+	go kafka.RunConsumer()
 
 	//	dao.GetList()
 	//util.GetSnapshot("D:\\CF\\stg.mp4","D:\\CF\\BEAR",20)
@@ -24,3 +26,4 @@ func main() {
 
 	r.Run(":8089") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
+

@@ -6,6 +6,7 @@ import (
 	"github.com/RaymondCode/simple-demo/entities"
 	"github.com/RaymondCode/simple-demo/util"
 	"gorm.io/gorm"
+	"strconv"
 	"sync"
 )
 
@@ -22,9 +23,9 @@ func NewUserDaoInstance() *UserDao {
 	})
 	return userDao
 }
-func GetUserByIdAndPassword(userId string, password string) (*entities.User2, error) {
+func GetUserByIdAndPassword(userId string, password string) (*entities.User, error) {
 	//检查用户名是否存在
-	var user entities.User2
+	var user entities.User
 	result := Db.Table("user").Where("user_id = ?", userId).Limit(1).Find(&user)
 	if result.RowsAffected == 0 {
 		err := errors.New("username does not exist")
@@ -36,11 +37,39 @@ func GetUserByIdAndPassword(userId string, password string) (*entities.User2, er
 		err := errors.New("wrong password")
 		return nil, err
 	}
-	fmt.Println("runhere")
 	return &user, nil
 }
 
-func AddNewUser(user2 entities.User2) error {
+func GetUserById(tokenString string)(entities.User){
+	var res entities.User
+	Db.Table("user").Where("user_id = ?",tokenString).Limit(1).Find(&res)
+	fmt.Printf("%+v\n",res)
+	return res
+}
+
+func GetUserByIdInt64(userId int64)(entities.User){
+	var res entities.User
+	id := strconv.FormatInt(userId,10)
+	Db.Table("user").Where("id = ?",id).Limit(1).Find(&res)
+
+	return res
+}
+
+func GetIdByUserId(userid string) string {
+	var res entities.User
+	Db.Table("user").Where("user_id = ?",userid).Limit(1).Find(&res)
+
+	return strconv.FormatInt(res.Id,10)
+
+}
+func GetUserByUserIdInt64(userId int64)(entities.User)  {
+	var res entities.User
+	id := strconv.FormatInt(userId,10)
+	Db.Table("user").Where("user_id = ?",id).Limit(1).Find(&res)
+	return res
+
+}
+func AddNewUser(user2 entities.User) error {
 	err := Db.Transaction(func(tx *gorm.DB) error {
 		// 在事务中执行一些 db 操作（从这里开始，您应该使用 'tx' 而不是 'db'）
 		if err := tx.Table("user").Create(user2).Error; err != nil {
@@ -53,4 +82,11 @@ func AddNewUser(user2 entities.User2) error {
 		return nil
 	})
 	return err
+}
+
+func GetUserListByIdArray(list []int64)([]entities.User){
+	var temp []entities.User
+
+	Db.Table("user").Where("id In ?", list).Debug().Find(&temp)
+	return temp
 }

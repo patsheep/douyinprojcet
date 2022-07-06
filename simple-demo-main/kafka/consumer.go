@@ -1,7 +1,8 @@
-package kafkatest
+package kafka
 
 import (
 	"fmt"
+	"github.com/RaymondCode/simple-demo/config"
 	"github.com/RaymondCode/simple-demo/dao"
 	"github.com/RaymondCode/simple-demo/service"
 	"github.com/RaymondCode/simple-demo/util"
@@ -59,7 +60,7 @@ func RunConsumer() {
 				if err != nil {
 					fmt.Println("bug")
 				}
-				util.GetSnapshot("D:\\douyin\\douyinprojcet\\simple-demo-main\\video\\"+finalName, "D:\\douyin\\douyinprojcet\\simple-demo-main\\cover\\"+finalName[0:len(finalName)-4], 10)
+				util.GetSnapshot(config.PROJECTPATH+config.VIDEO_ADDR+finalName, config.PROJECTPATH+config.COVER_ADDR+finalName[0:len(finalName)-4], 10)
 				fmt.Println("封面图生成完成")
 				publishToDB(finalName, key)
 				fmt.Println("审核完成#")
@@ -126,11 +127,11 @@ func publishToDB(filename string, id int64) {
 		CommentCount:  0,
 		IsFavorite:    false,
 	}*/
-	dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": "http://pathcystore.oss-cn-shanghai.aliyuncs.com/video/" + filename, "cover_url": "http://pathcystore.oss-cn-shanghai.aliyuncs.com/cover/" + filename[0:len(filename)-4] + ".jpeg"})
+	dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.CONFIG.OssConfig.Endpoint+"/video/" + filename, "cover_url": config.CONFIG.OssConfig.Endpoint+"/cover/" + filename[0:len(filename)-4] + ".jpeg"})
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go service.UploadFile(filename, &wg)                     //向OSS上传文件
-	go service.UploadCover(filename[0:len(filename)-4], &wg) //向OSS上传封面
+	go service.UploadFile(filename,id, &wg)                     //向OSS上传文件
+	go service.UploadCover(filename[0:len(filename)-4],id, &wg) //向OSS上传封面
 	wg.Wait()
 
 }
