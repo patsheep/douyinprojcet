@@ -1,10 +1,10 @@
 package service
 
 import (
-	"github.com/RaymondCode/simple-demo/dao"
-	"github.com/RaymondCode/simple-demo/entities"
-	"github.com/RaymondCode/simple-demo/util"
-	"github.com/RaymondCode/simple-demo/util/snowflake"
+	"github.com/patsheep/douyinproject/dao"
+	"github.com/patsheep/douyinproject/entities"
+	"github.com/patsheep/douyinproject/util"
+	"github.com/patsheep/douyinproject/util/snowflake"
 )
 
 func AddNewUser(userid, password string) error {

@@ -2,13 +2,13 @@ package controller
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/api"
-	"github.com/RaymondCode/simple-demo/config"
-	"github.com/RaymondCode/simple-demo/dao"
-	"github.com/RaymondCode/simple-demo/kafka"
-	"github.com/RaymondCode/simple-demo/service"
-	"github.com/RaymondCode/simple-demo/util/snowflake"
 	"github.com/gin-gonic/gin"
+	"github.com/patsheep/douyinproject/api"
+	"github.com/patsheep/douyinproject/config"
+	"github.com/patsheep/douyinproject/dao"
+	"github.com/patsheep/douyinproject/kafka"
+	"github.com/patsheep/douyinproject/service"
+	"github.com/patsheep/douyinproject/util/snowflake"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -24,8 +24,8 @@ type VideoListResponse struct {
 func Publish(c *gin.Context) {
 
 	token := c.PostForm("token")
-	fmt.Println("tokenis:"+token)
-	if exist,_ := service.GetToken(token); exist!=0 {
+	fmt.Println("tokenis:" + token)
+	if exist, _ := service.GetToken(token); exist != 0 {
 		c.JSON(http.StatusOK, api.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
@@ -48,15 +48,15 @@ func Publish(c *gin.Context) {
 		})
 		return
 	}
-	user_id :=dao.GetIdByUserId(strings.Split(token, ":")[0])
+	user_id := dao.GetIdByUserId(strings.Split(token, ":")[0])
 
-	user_idInt64, _ := strconv.ParseInt(user_id,10,64)
+	user_idInt64, _ := strconv.ParseInt(user_id, 10, 64)
 	var key = snowflake.MakeInt64SnowFlakeId()
-	dao.PublishTempToDB(user_idInt64,key)
+	dao.PublishTempToDB(user_idInt64, key)
 	finalName := fmt.Sprintf("%s_%d_%s", user_id, key, filename)
-	saveFile := config.PROJECTPATH+config.VIDEO_ADDR+finalName
+	saveFile := config.PROJECTPATH + config.VIDEO_ADDR + finalName
 
-	fmt.Println("saveFileDst"+saveFile)
+	fmt.Println("saveFileDst" + saveFile)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
 		c.JSON(http.StatusOK, api.Response{
 			StatusCode: 1,
@@ -78,14 +78,14 @@ func Publish(c *gin.Context) {
 func PublishList(c *gin.Context) {
 
 	token := c.Query("token") //Query是获得get请求的参数
-	fmt.Printf("token为%s\n",token)
-	if exist,_ := service.GetToken(token); exist!=0 {
+	fmt.Printf("token为%s\n", token)
+	if exist, _ := service.GetToken(token); exist != 0 {
 		c.JSON(http.StatusOK, api.Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
 		return
 	}
 
-	userId:=strings.Split(string(token), ":")[0]
-	Id,_ :=strconv.ParseInt(dao.GetIdByUserId(userId),10,64)
+	userId := strings.Split(string(token), ":")[0]
+	Id, _ := strconv.ParseInt(dao.GetIdByUserId(userId), 10, 64)
 	fmt.Println(userId)
 	c.JSON(http.StatusOK, VideoListResponse{
 		Response: api.Response{
@@ -94,5 +94,3 @@ func PublishList(c *gin.Context) {
 		VideoList: dao.GetListById(Id),
 	})
 }
-
-

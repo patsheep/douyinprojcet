@@ -2,11 +2,11 @@ package kafka
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/config"
-	"github.com/RaymondCode/simple-demo/dao"
-	"github.com/RaymondCode/simple-demo/service"
-	"github.com/RaymondCode/simple-demo/util"
 	"github.com/Shopify/sarama"
+	"github.com/patsheep/douyinproject/config"
+	"github.com/patsheep/douyinproject/dao"
+	"github.com/patsheep/douyinproject/service"
+	"github.com/patsheep/douyinproject/util"
 	"strconv"
 	"strings"
 	"sync"
@@ -127,11 +127,11 @@ func publishToDB(filename string, id int64) {
 		CommentCount:  0,
 		IsFavorite:    false,
 	}*/
-	dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.CONFIG.OssConfig.Endpoint+"/video/" + filename, "cover_url": config.CONFIG.OssConfig.Endpoint+"/cover/" + filename[0:len(filename)-4] + ".jpeg"})
+	dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.CONFIG.OssConfig.Endpoint + "/video/" + filename, "cover_url": config.CONFIG.OssConfig.Endpoint + "/cover/" + filename[0:len(filename)-4] + ".jpeg"})
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go service.UploadFile(filename,id, &wg)                     //向OSS上传文件
-	go service.UploadCover(filename[0:len(filename)-4],id, &wg) //向OSS上传封面
+	go service.UploadFile(filename, id, &wg)                     //向OSS上传文件
+	go service.UploadCover(filename[0:len(filename)-4], id, &wg) //向OSS上传封面
 	wg.Wait()
 
 }

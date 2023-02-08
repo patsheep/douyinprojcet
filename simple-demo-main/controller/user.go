@@ -2,12 +2,12 @@ package controller
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/api"
-	"github.com/RaymondCode/simple-demo/dao"
-	"github.com/RaymondCode/simple-demo/util/snowflake"
+	"github.com/patsheep/douyinproject/api"
+	"github.com/patsheep/douyinproject/dao"
+	"github.com/patsheep/douyinproject/util/snowflake"
 
-	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
+	"github.com/patsheep/douyinproject/service"
 	"net/http"
 	"strings"
 )
@@ -30,15 +30,13 @@ var usersLoginInfo = map[string]api.User{
 		FollowerCount: 0,
 		IsFollow:      false,
 	},
-	"12345:1656903457" :{
-		Id: 1,
+	"12345:1656903457": {
+		Id:            1,
 		Name:          "qwq",
 		FollowCount:   0,
 		FollowerCount: 0,
 		IsFollow:      false,
-
 	},
-
 }
 
 var userIdSequence = int64(1)
@@ -65,7 +63,7 @@ func Register(c *gin.Context) {
 			Response: api.Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
 	} else {
-		userIdSequence:=snowflake.MakeInt64SnowFlakeId()
+		userIdSequence := snowflake.MakeInt64SnowFlakeId()
 		newUser := api.User{
 			Id:   userIdSequence,
 			Name: username,
@@ -90,10 +88,10 @@ func Login(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
 
-	fmt.Println(username+" "+password)
-	if user, err := dao.GetUserByIdAndPassword(username, password); err==nil {
+	fmt.Println(username + " " + password)
+	if user, err := dao.GetUserByIdAndPassword(username, password); err == nil {
 
-		token,_ := service.GenerateToken(username)
+		token, _ := service.GenerateToken(username)
 
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: api.Response{StatusCode: 0},
@@ -110,11 +108,11 @@ func Login(c *gin.Context) {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-	user :=dao.GetUserById(strings.Split(string(token), ":")[0])
-	if exist,_ := service.GetToken(token); exist==0 {
+	user := dao.GetUserById(strings.Split(string(token), ":")[0])
+	if exist, _ := service.GetToken(token); exist == 0 {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: api.Response{StatusCode: 0},
-			User:    api.User{
+			User: api.User{
 				Id:            user.Id,
 				Name:          user.Name,
 				FollowCount:   0,

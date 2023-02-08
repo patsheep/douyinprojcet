@@ -4,16 +4,15 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"fmt"
-	"github.com/RaymondCode/simple-demo/config"
-	"github.com/RaymondCode/simple-demo/dao"
+	"github.com/patsheep/douyinproject/config"
+	"github.com/patsheep/douyinproject/dao"
 
-	"github.com/RaymondCode/simple-demo/util"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/patsheep/douyinproject/util"
 	"io"
 	"os"
 	"sync"
 )
-
 
 var videoBucket *oss.Bucket
 var client *oss.Client
@@ -24,7 +23,7 @@ func InitOss() {
 	accessKey := config.CONFIG.OssConfig.Key
 	accessSecret := config.CONFIG.OssConfig.Secret
 	endpoint := config.CONFIG.OssConfig.Endpoint
-	bucket :=config.CONFIG.OssConfig.Bucket
+	bucket := config.CONFIG.OssConfig.Bucket
 	// 创建OSSClient实例。
 	// yourEndpoint填写Bucket对应的Endpoint，以华东1（杭州）为例，填写为https://oss-cn-hangzhou.aliyuncs.com。其它Region请按实际情况填写。
 	// 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
@@ -61,7 +60,7 @@ func InitOss() {
 	fmt.Println("已连接bucket" + videoBucket.BucketName)
 
 }
-func UploadFile(name string,id int64, wg *sync.WaitGroup) {
+func UploadFile(name string, id int64, wg *sync.WaitGroup) {
 
 	//absPath, _ := os.Getwd()
 
@@ -76,7 +75,7 @@ func UploadFile(name string,id int64, wg *sync.WaitGroup) {
 	if err != nil {
 		fmt.Println("Error:", err)
 		fmt.Println("上传OSS失败，文件将保留本地")
-		dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.PROJECTPATH+config.VIDEO_ADDR + name})
+		dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.PROJECTPATH + config.VIDEO_ADDR + name})
 		return
 	}
 	err = videoBucket.SetObjectACL("video/"+name, oss.ACLPublicRead)
@@ -84,14 +83,14 @@ func UploadFile(name string,id int64, wg *sync.WaitGroup) {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
-	err = os.Remove(config.PROJECTPATH+config.VIDEO_ADDR+name)
+	err = os.Remove(config.PROJECTPATH + config.VIDEO_ADDR + name)
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
 
 }
-func UploadCover(name string,id int64, wg *sync.WaitGroup) {
+func UploadCover(name string, id int64, wg *sync.WaitGroup) {
 	absPath, _ := os.Getwd()
 
 	// 依次填写Object的完整路径（例如exampledir/exampleobject.txt）和本地文件的完整路径（例如D:\\localpath\\examplefile.txt）。
@@ -104,7 +103,7 @@ func UploadCover(name string,id int64, wg *sync.WaitGroup) {
 	if err != nil {
 		fmt.Println("Error:", err)
 		fmt.Println("封面上传失败，文件将保留本地")
-		dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"cover_url": config.PROJECTPATH+config.COVER_ADDR + name[0:len(name)-4] + ".jpeg"})
+		dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"cover_url": config.PROJECTPATH + config.COVER_ADDR + name[0:len(name)-4] + ".jpeg"})
 		return
 	}
 	err = coverBucket.SetObjectACL("cover/"+name+".jpeg", oss.ACLPublicRead)
@@ -112,7 +111,7 @@ func UploadCover(name string,id int64, wg *sync.WaitGroup) {
 		fmt.Println("Error:", err)
 		os.Exit(-1)
 	}
-	err = os.Remove(config.PROJECTPATH+config.COVER_ADDR + name + ".jpeg")
+	err = os.Remove(config.PROJECTPATH + config.COVER_ADDR + name + ".jpeg")
 	if err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(-1)

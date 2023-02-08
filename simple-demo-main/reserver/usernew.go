@@ -2,11 +2,11 @@ package reserver
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/api"
-	"github.com/RaymondCode/simple-demo/dao"
-	"github.com/RaymondCode/simple-demo/entities"
-	"github.com/RaymondCode/simple-demo/service"
 	"github.com/gin-gonic/gin"
+	"github.com/patsheep/douyinproject/api"
+	"github.com/patsheep/douyinproject/dao"
+	"github.com/patsheep/douyinproject/entities"
+	"github.com/patsheep/douyinproject/service"
 	"net/http"
 	"sync/atomic"
 )

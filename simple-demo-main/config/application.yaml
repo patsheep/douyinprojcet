@@ -10,7 +10,7 @@ mysql:
   password: 97782078
   db_name: douyin
   max_open_conns: 100
-  max_idle_conns: 10
+  max_idle_conns: 50
 
 redis:
   host: localhost

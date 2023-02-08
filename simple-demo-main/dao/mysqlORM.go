@@ -2,9 +2,9 @@ package dao
 
 import (
 	"fmt"
-	"github.com/RaymondCode/simple-demo/api"
-	"github.com/RaymondCode/simple-demo/config"
-	"github.com/RaymondCode/simple-demo/entities"
+	"github.com/patsheep/douyinproject/api"
+	"github.com/patsheep/douyinproject/config"
+	"github.com/patsheep/douyinproject/entities"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -28,7 +28,7 @@ var Db *gorm.DB
 }*/
 
 func InitDb() {
-	username := config.CONFIG.MySQLConfig.Username// 账号
+	username := config.CONFIG.MySQLConfig.Username // 账号
 	password := config.CONFIG.MySQLConfig.Password // 密码
 	host := config.CONFIG.MySQLConfig.Host         // 数据库地址，可以是Ip或者域名
 	port := config.CONFIG.MySQLConfig.Port         // 数据库端口
@@ -45,8 +45,8 @@ func InitDb() {
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags),
 		logger.Config{
-			SlowThreshold:             time.Millisecond * 0, // 慢 SQL 阈值
-			LogLevel:                  logger.Info,          // 日志级别
+			SlowThreshold:             time.Millisecond * 0, // 慢 SQL 阈值,0就是无限时间
+			LogLevel:                  logger.Warn,          // 日志级别
 			IgnoreRecordNotFoundError: true,                 // 忽略ErrRecordNotFound（记录未找到）错误
 			Colorful:                  false,                // 禁用彩色打印
 		},
@@ -57,13 +57,14 @@ func InitDb() {
 		sqlDB, _ := db.DB()
 		sqlDB.SetMaxOpenConns(config.CONFIG.MySQLConfig.MaxOpenConns) // 设置数据库最大连接数
 		sqlDB.SetMaxIdleConns(config.CONFIG.MySQLConfig.MaxIdleConns) // 设置上数据库最大闲置连接数
-		Db=db
+		sqlDB.SetConnMaxLifetime(time.Second * 3)                     //设置连接最大时间
+		Db = db
+
 	} else {
 		panic("connect server failed")
 	}
 
 }
-
 
 func GetList() []api.Video {
 	//node := entities.Tbs{Val: 1}

@@ -3,8 +3,8 @@ package dao
 import (
 	"errors"
 	"fmt"
-	"github.com/RaymondCode/simple-demo/entities"
-	"github.com/RaymondCode/simple-demo/util"
+	"github.com/patsheep/douyinproject/entities"
+	"github.com/patsheep/douyinproject/util"
 	"gorm.io/gorm"
 	"strconv"
 	"sync"
@@ -40,32 +40,32 @@ func GetUserByIdAndPassword(userId string, password string) (*entities.User, err
 	return &user, nil
 }
 
-func GetUserById(tokenString string)(entities.User){
+func GetUserById(tokenString string) entities.User {
 	var res entities.User
-	Db.Table("user").Where("user_id = ?",tokenString).Limit(1).Find(&res)
-	fmt.Printf("%+v\n",res)
+	Db.Table("user").Where("user_id = ?", tokenString).Limit(1).Find(&res)
+	fmt.Printf("%+v\n", res)
 	return res
 }
 
-func GetUserByIdInt64(userId int64)(entities.User){
+func GetUserByIdInt64(userId int64) entities.User {
 	var res entities.User
-	id := strconv.FormatInt(userId,10)
-	Db.Table("user").Where("id = ?",id).Limit(1).Find(&res)
+	id := strconv.FormatInt(userId, 10)
+	Db.Table("user").Where("id = ?", id).Limit(1).Find(&res)
 
 	return res
 }
 
 func GetIdByUserId(userid string) string {
 	var res entities.User
-	Db.Table("user").Where("user_id = ?",userid).Limit(1).Find(&res)
+	Db.Table("user").Where("user_id = ?", userid).Limit(1).Find(&res)
 
-	return strconv.FormatInt(res.Id,10)
+	return strconv.FormatInt(res.Id, 10)
 
 }
-func GetUserByUserIdInt64(userId int64)(entities.User)  {
+func GetUserByUserIdInt64(userId int64) entities.User {
 	var res entities.User
-	id := strconv.FormatInt(userId,10)
-	Db.Table("user").Where("user_id = ?",id).Limit(1).Find(&res)
+	id := strconv.FormatInt(userId, 10)
+	Db.Table("user").Where("user_id = ?", id).Limit(1).Find(&res)
 	return res
 
 }
@@ -84,9 +84,28 @@ func AddNewUser(user2 entities.User) error {
 	return err
 }
 
-func GetUserListByIdArray(list []int64)([]entities.User){
+func GetUserListByIdArray(list []int64) []entities.User {
 	var temp []entities.User
 
 	Db.Table("user").Where("id In ?", list).Debug().Find(&temp)
 	return temp
+}
+
+type node struct {
+	Id       int
+	Userid   int
+	Username string
+	Password string
+	Salt     int
+}
+
+func AddUserAccount(val int, wg *sync.WaitGroup) {
+
+	Db.Table("user_account").Create(&node{
+		Userid:   val,
+		Username: "",
+		Password: "",
+		Salt:     0,
+	})
+	defer wg.Done()
 }
