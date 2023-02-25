@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/patsheep/douyinproject/api"
 	"github.com/patsheep/douyinproject/dao"
-	"github.com/patsheep/douyinproject/entities"
+	//"github.com/patsheep/douyinproject/entities"
 	"github.com/patsheep/douyinproject/service"
 	"net/http"
 	"sync/atomic"
