@@ -14,6 +14,7 @@ func main() {
 	initialize.AssignMent()
 
 	// go kafkatest.RunProducer();
+	//go kafka.RunProducer()
 	go kafka.RunConsumer()
 
 	//	dao.GetList()

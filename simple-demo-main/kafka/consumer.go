@@ -127,11 +127,20 @@ func publishToDB(filename string, id int64) {
 		CommentCount:  0,
 		IsFavorite:    false,
 	}*/
-	dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.CONFIG.OssConfig.Endpoint + "/video/" + filename, "cover_url": config.CONFIG.OssConfig.Endpoint + "/cover/" + filename[0:len(filename)-4] + ".jpeg"})
+	//dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": config.CONFIG.OssConfig.Endpoint + "/video/" + filename, "cover_url": config.CONFIG.OssConfig.Endpoint + "/cover/" + filename[0:len(filename)-4] + ".jpeg"})
+	dao.Db.Table("video").Where("id", id).Updates(map[string]interface{}{"play_url": generateUrl("video", filename), "cover_url": generateUrl("cover", filename)})
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go service.UploadFile(filename, id, &wg)                     //向OSS上传文件
 	go service.UploadCover(filename[0:len(filename)-4], id, &wg) //向OSS上传封面
 	wg.Wait()
 
+}
+
+func generateUrl(strType string, fileName string) string {
+	url := config.CONFIG.OssConfig.Endpoint[0:8] + config.CONFIG.OssConfig.Bucket + "." + config.CONFIG.OssConfig.Endpoint[8:]
+	if strType == "video" {
+		return url + "/video/" + fileName
+	}
+	return url + "/cover/" + fileName[0:len(fileName)-4] + ".jpeg"
 }

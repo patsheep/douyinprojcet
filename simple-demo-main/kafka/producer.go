@@ -52,6 +52,7 @@ func ProducerSend(str string, key int64) {
 	config.Producer.Partitioner = sarama.NewRandomPartitioner //生成用于选择要发送消息的分区的分区(默认为散列消息键)。
 	config.Producer.Return.Successes = true                   //如果启用，成功传递的消息将在成功通道(默认禁用)。
 	//获取客户端对象
+	fmt.Println("sendProducer")
 	client, err := sarama.NewSyncProducer([]string{"localhost:9092"}, config)
 	if err != nil {
 		//获取客户端失败

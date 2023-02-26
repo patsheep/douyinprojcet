@@ -58,6 +58,7 @@ func Publish(c *gin.Context) {
 
 	fmt.Println("saveFileDst" + saveFile)
 	if err := c.SaveUploadedFile(data, saveFile); err != nil {
+		fmt.Println("文件上传出错")
 		c.JSON(http.StatusOK, api.Response{
 			StatusCode: 1,
 			StatusMsg:  err.Error(),
